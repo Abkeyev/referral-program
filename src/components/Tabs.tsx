@@ -155,6 +155,7 @@ const Tabs = (props: any) => {
                     title="Физическое лицо, на которое оформлен кредит"
                     placement="right"
                     arrow
+                    enterTouchDelay={0}
                     interactive
                   >
                     <InputAdornment position="end">
@@ -180,6 +181,7 @@ const Tabs = (props: any) => {
                   <BccTooltip
                     title="Например, справка с места работы о предоставлении отпуска без содержания или уменьшении заработной платы; документ подтверждающий потерю работы; в случаях, когда отсрочка запрашивается по состоянию здоровья, необходимо предоставить больничный лист или заключение врача и т.д."
                     placement="right"
+                    enterTouchDelay={0}
                     arrow
                     interactive
                   >

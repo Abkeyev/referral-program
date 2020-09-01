@@ -180,6 +180,16 @@ const useStyles = makeStyles((theme: Theme) =>
         position: "relative",
       },
     },
+    successForm: {
+      backgroundColor: "rgba(125, 206, 160, 0.1)",
+      textAlign: "center",
+      padding: "56px 64px 112px",
+      "& > img": {
+        display: "block",
+        margin: "0 auto",
+        marginBottom: 24,
+      },
+    },
     progressBarInnerSuccess: {
       position: "absolute",
       background: "#27AE60",
@@ -212,7 +222,6 @@ const BccMaskedInput = (props: TextMaskCustomProps) => {
 
 const Order = (props: any) => {
   const classes = useStyles({});
-  const [name, setName] = React.useState("");
   const [type, setType] = React.useState("1");
   const [step, setStep] = React.useState(0);
   const [filial, setFilial] = React.useState("");
@@ -229,8 +238,13 @@ const Order = (props: any) => {
   const [reason, setReason] = React.useState("");
   const [creditNumber, setCreditNumber] = React.useState("");
   const [timer, setTimer] = React.useState(0);
+  const [file1, setFile1] = React.useState("");
+  const [file2, setFile2] = React.useState("");
+  const [file3, setFile3] = React.useState("");
+  const [branches, setBranches] = React.useState([] as any);
 
   React.useEffect(() => {
+    api.reference.getCityBranches().then((m: any) => setBranches(m));
     let timeOut = setInterval(() => {
       if (timer !== 0) {
         setTimer(timer - 1);
@@ -255,6 +269,14 @@ const Order = (props: any) => {
         agree
       );
     else if (step === 1) return code.length === 6;
+    else if (step === 2)
+      return type === "1"
+        ? creditNumber.length > 5 && period && reason && file1 && file2 && file3
+        : creditNumber.length > 5 &&
+            other.length > 5 &&
+            file1 &&
+            file2 &&
+            file3;
     else return true;
   };
 
@@ -452,7 +474,7 @@ const Order = (props: any) => {
                     <BccInput
                       fullWidth={true}
                       className={classes.inputStyle}
-                      label={"Тип заявки"}
+                      label="Тип заявки"
                       id="type"
                       name="type"
                       value={type}
@@ -464,7 +486,7 @@ const Order = (props: any) => {
                         Отсрочка по кредиту
                       </MenuItem>
                       <MenuItem key={2} value={2}>
-                        Отсрочка по рассрочке
+                        Заявка по иным вопросам
                       </MenuItem>
                     </BccInput>
                   </Grid>
@@ -480,12 +502,16 @@ const Order = (props: any) => {
                       variant="outlined"
                       select
                     >
-                      <MenuItem key={1} value={1}>
-                        Алматы
-                      </MenuItem>
-                      <MenuItem key={2} value={2}>
-                        Астана
-                      </MenuItem>
+                      {branches !== null &&
+                        branches?.map((b: any) =>
+                          b.markers?.map((bb: any) => {
+                            return (
+                              <MenuItem key={1} value={1}>
+                                {b.value + " " + bb.name}
+                              </MenuItem>
+                            );
+                          })
+                        )}
                     </BccInput>
                   </Grid>
                   <Grid item>
@@ -654,181 +680,319 @@ const Order = (props: any) => {
                   </Grid>
                 </>
               ) : step === 2 ? (
-                <>
-                  <Grid item>
-                    <BccInput
-                      className={classes.inputStyle}
-                      fullWidth
-                      label="Номер кредитного договора"
-                      variant="filled"
-                      id="creditNumber"
-                      name="creditNumber"
-                      value={creditNumber}
-                      onChange={(e: any) => setCreditNumber(e.target.value)}
-                    />
-                  </Grid>
-                  <Grid item>
-                    <BccInput
-                      fullWidth={true}
-                      className={classes.inputStyle}
-                      label={"Период отсрочки"}
-                      id="period"
-                      name="period"
-                      value={period}
-                      onChange={(e: any) => setPeriod(e.target.value)}
-                      variant="outlined"
-                      select
-                    >
-                      <MenuItem key={1} value={1}>
-                        12 месяцев
-                      </MenuItem>
-                      <MenuItem key={2} value={2}>
-                        24 месяца
-                      </MenuItem>
-                    </BccInput>
-                  </Grid>
-                  <Grid item>
-                    <BccInput
-                      fullWidth={true}
-                      className={classes.inputStyle}
-                      label={"Причина отсрочки"}
-                      id="reason"
-                      name="reason"
-                      value={reason}
-                      onChange={(e: any) => setReason(e.target.value)}
-                      variant="outlined"
-                      select
-                    >
-                      <MenuItem key={1} value={1}>
-                        Причина
-                      </MenuItem>
-                      <MenuItem key={2} value={2}>
-                        Еще какая-та причина
-                      </MenuItem>
-                    </BccInput>
-                  </Grid>
-                  <Grid
-                    item
-                    container
-                    justify="space-between"
-                    wrap="nowrap"
-                    className={classes.docForm}
-                  >
+                type === "1" ? (
+                  <>
                     <Grid item>
-                      <BccTypography type="p2" color="#4D565F">
-                        Подтверждающий документ
-                      </BccTypography>
-                    </Grid>
-                    <Grid item>
-                      <input
-                        accept="image/*"
-                        style={{ display: "none" }}
-                        id="upload"
-                        multiple
-                        type="file"
+                      <BccInput
+                        className={classes.inputStyle}
+                        fullWidth
+                        label="Номер кредитного договора"
+                        variant="filled"
+                        id="creditNumber"
+                        name="creditNumber"
+                        value={creditNumber}
+                        onChange={(e: any) => setCreditNumber(e.target.value)}
                       />
-                      <label htmlFor="upload">
-                        <BccButton
-                          variant="outlined"
-                          color="secondary"
-                          component="span"
-                          size="small"
-                        >
-                          Выбрать файл
-                        </BccButton>
-                      </label>
-                    </Grid>
-                  </Grid>
-                  <Grid
-                    item
-                    container
-                    justify="space-between"
-                    wrap="nowrap"
-                    className={classes.docForm}
-                  >
-                    <Grid item>
-                      <BccTypography type="p2" color="#4D565F">
-                        Подтверждающий документ
-                      </BccTypography>
                     </Grid>
                     <Grid item>
-                      <input
-                        accept="image/*"
-                        style={{ display: "none" }}
-                        id="upload"
-                        multiple
-                        type="file"
-                      />
-                      <label htmlFor="upload">
-                        <BccButton
-                          variant="outlined"
-                          color="secondary"
-                          component="span"
-                          size="small"
-                        >
-                          Выбрать файл
-                        </BccButton>
-                      </label>
-                    </Grid>
-                  </Grid>
-                  <Grid
-                    item
-                    container
-                    justify="space-between"
-                    wrap="nowrap"
-                    className={classes.docForm}
-                  >
-                    <Grid item>
-                      <BccTypography type="p2" color="#4D565F">
-                        Подтверждающий документ
-                      </BccTypography>
+                      <BccInput
+                        fullWidth={true}
+                        className={classes.inputStyle}
+                        label={"Период отсрочки"}
+                        id="period"
+                        name="period"
+                        value={period}
+                        onChange={(e: any) => setPeriod(e.target.value)}
+                        variant="outlined"
+                        select
+                      >
+                        <MenuItem key={1} value={1}>
+                          12 месяцев
+                        </MenuItem>
+                        <MenuItem key={2} value={2}>
+                          24 месяца
+                        </MenuItem>
+                      </BccInput>
                     </Grid>
                     <Grid item>
-                      <input
-                        accept="image/*"
-                        style={{ display: "none" }}
-                        id="upload"
-                        multiple
-                        type="file"
-                      />
-                      <label htmlFor="upload">
-                        <BccButton
-                          variant="outlined"
-                          color="secondary"
-                          component="span"
-                          size="small"
-                        >
-                          Выбрать файл
-                        </BccButton>
-                      </label>
+                      <BccInput
+                        fullWidth={true}
+                        className={classes.inputStyle}
+                        label={"Причина отсрочки"}
+                        id="reason"
+                        name="reason"
+                        value={reason}
+                        onChange={(e: any) => setReason(e.target.value)}
+                        variant="outlined"
+                        select
+                      >
+                        <MenuItem key={1} value={1}>
+                          Причина
+                        </MenuItem>
+                        <MenuItem key={2} value={2}>
+                          Еще какая-та причина
+                        </MenuItem>
+                      </BccInput>
                     </Grid>
-                  </Grid>
-                  <Grid item>
-                    <BccInput
-                      className={classes.inputStyleText}
-                      fullWidth
-                      label="Если вы подаёте заявку по прочим вопросам - заполните здесь подробности"
-                      variant="filled"
-                      id="other"
-                      name="other"
-                      multiline
-                      value={other}
-                      onChange={(e: any) => setOther(e.target.value)}
-                    />
-                  </Grid>
-                  <Grid item>
-                    <BccButton
-                      variant="contained"
-                      disabled={!isValid()}
-                      color="primary"
-                      fullWidth
+                    <Grid
+                      item
+                      container
+                      justify="space-between"
+                      wrap="nowrap"
+                      className={classes.docForm}
                     >
-                      Отправить заявку
-                    </BccButton>
-                  </Grid>
-                </>
+                      <Grid item>
+                        <BccTypography type="p2" color="#4D565F">
+                          Подтверждающий документ
+                        </BccTypography>
+                      </Grid>
+                      <Grid item>
+                        <input
+                          accept="application/msword"
+                          style={{ display: "none" }}
+                          id="upload1"
+                          value={file1}
+                          type="file"
+                        />
+                        <label htmlFor="upload1">
+                          <BccButton
+                            variant="outlined"
+                            color="secondary"
+                            component="span"
+                            size="small"
+                          >
+                            Выбрать файл
+                          </BccButton>
+                        </label>
+                      </Grid>
+                    </Grid>
+                    <Grid
+                      item
+                      container
+                      justify="space-between"
+                      wrap="nowrap"
+                      className={classes.docForm}
+                    >
+                      <Grid item>
+                        <BccTypography type="p2" color="#4D565F">
+                          Подтверждающий документ
+                        </BccTypography>
+                      </Grid>
+                      <Grid item>
+                        <input
+                          accept="application/msword"
+                          style={{ display: "none" }}
+                          id="upload2"
+                          value={file2}
+                          type="file"
+                        />
+                        <label htmlFor="upload2">
+                          <BccButton
+                            variant="outlined"
+                            color="secondary"
+                            component="span"
+                            size="small"
+                          >
+                            Выбрать файл
+                          </BccButton>
+                        </label>
+                      </Grid>
+                    </Grid>
+                    <Grid
+                      item
+                      container
+                      justify="space-between"
+                      wrap="nowrap"
+                      className={classes.docForm}
+                    >
+                      <Grid item>
+                        <BccTypography type="p2" color="#4D565F">
+                          Подтверждающий документ
+                        </BccTypography>
+                      </Grid>
+                      <Grid item>
+                        <input
+                          accept="application/msword"
+                          style={{ display: "none" }}
+                          id="upload3"
+                          value={file3}
+                          type="file"
+                        />
+                        <label htmlFor="upload3">
+                          <BccButton
+                            variant="outlined"
+                            color="secondary"
+                            component="span"
+                            size="small"
+                          >
+                            Выбрать файл
+                          </BccButton>
+                        </label>
+                      </Grid>
+                    </Grid>
+                    <Grid item>
+                      <BccButton
+                        variant="contained"
+                        disabled={!isValid()}
+                        onClick={() => startProcess()}
+                        color="primary"
+                        fullWidth
+                      >
+                        Отправить заявку
+                      </BccButton>
+                    </Grid>
+                  </>
+                ) : (
+                  <>
+                    <Grid item>
+                      <BccInput
+                        className={classes.inputStyle}
+                        fullWidth
+                        label="Номер кредитного договора"
+                        variant="filled"
+                        id="creditNumber"
+                        name="creditNumber"
+                        value={creditNumber}
+                        onChange={(e: any) => setCreditNumber(e.target.value)}
+                      />
+                    </Grid>
+                    <Grid item>
+                      <BccInput
+                        className={classes.inputStyleText}
+                        fullWidth
+                        label="Текст заявления"
+                        variant="filled"
+                        id="other"
+                        name="other"
+                        multiline
+                        value={other}
+                        onChange={(e: any) => setOther(e.target.value)}
+                      />
+                    </Grid>
+                    <Grid
+                      item
+                      container
+                      justify="space-between"
+                      wrap="nowrap"
+                      className={classes.docForm}
+                    >
+                      <Grid item>
+                        <BccTypography type="p2" color="#4D565F">
+                          Подтверждающий документ
+                        </BccTypography>
+                      </Grid>
+                      <Grid item>
+                        <input
+                          accept="application/msword"
+                          value={file1}
+                          style={{ display: "none" }}
+                          id="upload11"
+                          type="file"
+                        />
+                        <label htmlFor="upload11">
+                          <BccButton
+                            variant="outlined"
+                            color="secondary"
+                            component="span"
+                            size="small"
+                          >
+                            Выбрать файл
+                          </BccButton>
+                        </label>
+                      </Grid>
+                    </Grid>
+                    <Grid
+                      item
+                      container
+                      justify="space-between"
+                      wrap="nowrap"
+                      className={classes.docForm}
+                    >
+                      <Grid item>
+                        <BccTypography type="p2" color="#4D565F">
+                          Подтверждающий документ
+                        </BccTypography>
+                      </Grid>
+                      <Grid item>
+                        <input
+                          accept="application/msword"
+                          style={{ display: "none" }}
+                          id="upload22"
+                          value={file2}
+                          type="file"
+                        />
+                        <label htmlFor="upload22">
+                          <BccButton
+                            variant="outlined"
+                            color="secondary"
+                            component="span"
+                            size="small"
+                          >
+                            Выбрать файл
+                          </BccButton>
+                        </label>
+                      </Grid>
+                    </Grid>
+                    <Grid
+                      item
+                      container
+                      justify="space-between"
+                      wrap="nowrap"
+                      className={classes.docForm}
+                    >
+                      <Grid item>
+                        <BccTypography type="p2" color="#4D565F">
+                          Подтверждающий документ
+                        </BccTypography>
+                      </Grid>
+                      <Grid item>
+                        <input
+                          accept="application/msword"
+                          style={{ display: "none" }}
+                          id="upload33"
+                          value={file3}
+                          type="file"
+                        />
+                        <label htmlFor="upload33">
+                          <BccButton
+                            variant="outlined"
+                            color="secondary"
+                            component="span"
+                            size="small"
+                          >
+                            Выбрать файл
+                          </BccButton>
+                        </label>
+                      </Grid>
+                    </Grid>
+                    <Grid item>
+                      <BccButton
+                        variant="contained"
+                        disabled={!isValid()}
+                        onClick={() => startProcess()}
+                        color="primary"
+                        fullWidth
+                      >
+                        Отправить заявку
+                      </BccButton>
+                    </Grid>
+                  </>
+                )
               ) : (
-                <div></div>
+                <Grid item>
+                  <div className={classes.successForm}>
+                    <img
+                      src={process.env.PUBLIC_URL + "/img/success.svg"}
+                      alt=""
+                    />
+                    <BccTypography type="h6" color="#1F7042" mb="16px">
+                      Заявка успешно отправлена
+                    </BccTypography>
+                    <BccTypography type="p2" color="#1F7042">
+                      Следуйте инструкции, которые мы отправили по СМС
+                    </BccTypography>
+                  </div>
+                </Grid>
               )}
             </BlockUi>
           </Grid>
