@@ -1,7 +1,8 @@
-import React, { Children } from "react";
-import { Grid } from "@material-ui/core";
+import React from "react";
+import { Grid, Select, MenuItem } from "@material-ui/core";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import { BccButton, BccTypography } from "../components/BccComponents";
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -185,6 +186,7 @@ const useStyles = makeStyles((theme: Theme) =>
     [theme.breakpoints.down("sm")]: {
       sliderBtn: {
         minWidth: 250,
+        lineHeight: "inherit",
       },
     },
     [theme.breakpoints.down("xs")]: {
@@ -205,7 +207,8 @@ const useStyles = makeStyles((theme: Theme) =>
         left: "calc(50% - 47px)",
       },
       sliderSubTitle: {
-        marginBottom: 16,
+        marginBottom: 24,
+        fontSize: 18,
       },
       slideRight: { display: "none" },
       slideLeft: { display: "none" },
@@ -217,7 +220,8 @@ const useStyles = makeStyles((theme: Theme) =>
           padding: "16px 0 0",
         },
         "& > div:last-child": {
-          marginTop: 46,
+          marginTop: 24,
+          marginBottom: 24,
           width: "100%",
           "& > img": {
             position: "relative",
@@ -245,27 +249,44 @@ const useStyles = makeStyles((theme: Theme) =>
     header: {
       paddingTop: 48,
     },
+    select: {
+      color: "#000D1A",
+      paddingLeft: 7,
+      fontSize: 14,
+      backgroundColor: "white",
+      borderRadius: 8,
+      "& > svg": {
+        color: "#000D1A",
+      },
+      "&:hover:not(.Mui-disabled):before": {
+        borderBottom: 0,
+      },
+      "&::after, &::before": {
+        borderBottom: 0,
+      },
+      "& > div:focus": {
+        backgroundColor: "transparent",
+      },
+    },
   })
 );
 
-interface SliderStepsProps {
-  title: string;
-  desc: any;
-  img: string;
-  btnText: string;
-  bgColor?: string;
-}
-
 interface SliderProps {
-  steps: Array<SliderStepsProps> | SliderStepsProps;
   scrollToOrder: any;
+  lang: string;
+  changeLang: any;
 }
 
 const Slider = (props: SliderProps) => {
   const classes = useStyles({});
+  const { t, i18n } = useTranslation();
 
   const goToOrder = () => {
     props.scrollToOrder();
+  };
+
+  const handleLangChange = (lang: any) => {
+    props.changeLang(lang);
   };
 
   return (
@@ -273,47 +294,62 @@ const Slider = (props: SliderProps) => {
       <div className={classes.container}>
         <div className={classes.slider}>
           <div>
-            <Grid container className={classes.header}>
+            <Grid
+              container
+              justify="space-between"
+              wrap="nowrap"
+              className={classes.header}
+            >
               <Grid item>
-                <img src={process.env.PUBLIC_URL + "/img/logo.svg"} />
+                <a href="https://www.bcc.kz/deferral">
+                  <img src={process.env.PUBLIC_URL + "/img/logo.svg"} />
+                </a>
+              </Grid>
+              <Grid item>
+                <Select
+                  className={classes.select}
+                  value={props.lang}
+                  onChange={(e: any) => handleLangChange(e.target.value)}
+                >
+                  <MenuItem value="ru">РУС</MenuItem>
+                  <MenuItem value="kz">КАЗ</MenuItem>
+                </Select>
               </Grid>
             </Grid>
-            {!Array.isArray(props.steps) && (
-              <Grid
-                container
-                justify="space-between"
-                wrap="nowrap"
-                className={classes.slide}
-              >
-                <Grid item>
-                  <BccTypography type="h2" block className={classes.slderTitle}>
-                    {props.steps.title}
-                  </BccTypography>
-                  <BccTypography
-                    type="h4"
-                    weight="normal"
-                    block
-                    className={classes.sliderSubTitle}
-                  >
-                    {props.steps.desc}
-                  </BccTypography>
-                  <BccButton
-                    variant="contained"
-                    color="primary"
-                    className={classes.sliderBtn}
-                    onClick={() => goToOrder()}
-                  >
-                    {props.steps.btnText}
-                  </BccButton>
-                </Grid>
-                <Grid item>
-                  <img
-                    src={process.env.PUBLIC_URL + props.steps.img}
-                    alt="slide1"
-                  />
-                </Grid>
+            <Grid
+              container
+              justify="space-between"
+              wrap="nowrap"
+              className={classes.slide}
+            >
+              <Grid item>
+                <BccTypography type="h2" block className={classes.slderTitle}>
+                  {t("header.title")}
+                </BccTypography>
+                <BccTypography
+                  type="h4"
+                  weight="normal"
+                  block
+                  className={classes.sliderSubTitle}
+                >
+                  {t("header.subtitle")}
+                </BccTypography>
+                <BccButton
+                  variant="contained"
+                  color="primary"
+                  className={classes.sliderBtn}
+                  onClick={() => goToOrder()}
+                >
+                  {t("header.btn")}
+                </BccButton>
               </Grid>
-            )}
+              <Grid item>
+                <img
+                  src={process.env.PUBLIC_URL + "/img/bg.png"}
+                  alt="slide1"
+                />
+              </Grid>
+            </Grid>
           </div>
         </div>
       </div>

@@ -1,9 +1,11 @@
-import React from "react";
+import React, { Suspense } from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
+import "./i18next";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 import { createMuiTheme, MuiThemeProvider } from "@material-ui/core";
+import Loading from "./components/Loading";
 
 const theme = createMuiTheme({
   props: {
@@ -16,7 +18,9 @@ const theme = createMuiTheme({
 ReactDOM.render(
   <React.StrictMode>
     <MuiThemeProvider theme={theme}>
-      <App />
+      <Suspense fallback={<Loading />}>
+        <App />
+      </Suspense>
     </MuiThemeProvider>
   </React.StrictMode>,
   document.getElementById("root")

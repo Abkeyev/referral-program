@@ -1,204 +1,561 @@
 import React from "react";
-import { Grid, MenuItem, FormControlLabel } from "@material-ui/core";
+import { Grid, MenuItem } from "@material-ui/core";
 import {
   BccTypography,
   BccCheckbox,
   BccInput,
   BccLink,
-  BccSelect,
+  BccSlider,
   BccButton,
   BccAlert,
 } from "./BccComponents";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
-import MaskedInput from "react-maskedinput";
+import InputMask from "react-input-mask";
 import BlockUi from "react-block-ui";
+import "react-block-ui/style.css";
 import api from "../api/Api";
+import FileReaderInput from "react-file-reader-input";
+import { useTranslation } from "react-i18next";
+
 const webConfigEnv = (window as any).env;
+const cityList = [
+  "Нур-Султан",
+  "Алматы",
+  "Шымкент",
+  "Актау",
+  "Актобе",
+  "Атырау",
+  "Жезказган",
+  "Караганда",
+  "Кокшетау",
+  "Костанай",
+  "Кызылорда",
+  "Павлодар",
+  "Петропавловск",
+  "Семей",
+  "Талдыкорган",
+  "Тараз",
+  "Уральск",
+  "Усть-Каменогорск",
+];
+const cityListKz = [
+  "Нұр-Сұлтан",
+  "Алматы",
+  "Шымкент",
+  "Ақтау",
+  "Ақтөбе",
+  "Атырау",
+  "Жезқазған",
+  "Қарағанды",
+  "Көкшетау",
+  "Қостанай",
+  "Қызылорда",
+  "Павлодар",
+  "Петропавл",
+  "Семей",
+  "Талдықорған",
+  "Тараз",
+  "Орал",
+  "Өскемен",
+];
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    outerContainer: {
-      background: "#ffffff",
-    },
-    innerOrderForm: {},
-    container: {
-      maxWidth: 1280,
-      margin: "0 auto",
-      textAlign: "center",
-      boxSizing: "border-box",
-      padding: "48px 96px",
-    },
-    orderTitle: {
-      width: "65%",
-      margin: "0 auto",
-    },
-    orderNum: {
-      color: "#249052",
-      paddingRight: 10,
-      borderRight: ".5px solid rgba(20, 20, 20, .7)",
-    },
-    orderNumTitle: {
-      paddingLeft: 10,
-      color: "#141414",
-    },
-    orderNumText: {
-      marginTop: 20,
-      opacity: 0.7,
-    },
-    item: {
-      width: "calc(33% - 20px)",
-    },
-    orderForm: {
-      background: "#FFFFFF",
-      boxShadow:
-        "0px 0px 1px rgba(0, 0, 0, 0.04), 0px 2px 6px rgba(0, 0, 0, 0.04), 0px 10px 20px rgba(0, 0, 0, 0.04)",
-      borderRadius: 8,
-      width: "60%",
-      padding: 46,
-      boxSizing: "border-box",
-      maxWidth: "60%",
-      margin: "0 auto",
-      textAlign: "center",
-    },
-    titleForm: {
-      marginBottom: 16,
-    },
-    subTitleForm: {
-      marginBottom: 46,
-      opacity: 0.7,
-    },
-    inputStyle: {
-      marginBottom: 24,
-      textAlign: "left",
-    },
-    inputStyleText: {
-      textAlign: "left",
-      marginBottom: 32,
-    },
-    checkboxText: {
-      alignItems: "center",
-      marginBottom: 48,
-    },
-    btnWrap: {
-      width: "calc(50% - 10px)",
-      "& > button": { width: "100%" },
-    },
-    icon: {
-      width: "18px",
-      height: "19px",
-    },
-    progress: {
-      backgroundColor: "#E0E0E0",
-      height: 36,
-      borderRadius: 4,
-      marginBottom: 24,
-      textAlign: "center",
-      "& > span": {
-        lineHeight: "36px",
+    [theme.breakpoints.between("md", "xl")]: {
+      outerContainer: {
+        background: "#ffffff",
       },
-    },
-    alert: {
-      marginBottom: 32,
-    },
-    garant: { textAlign: "left" },
-    orderSteps: {
-      marginBottom: 48,
-      boxSizing: "border-box",
-      "& > div:first-child": {
-        "& > div:first-child": {
-          marginLeft: "calc(33% / 2 - 20px)",
+      innerOrderForm: {},
+      container: {
+        maxWidth: 1280,
+        margin: "0 auto",
+        textAlign: "center",
+        boxSizing: "border-box",
+        padding: "48px 96px",
+      },
+      orderTitle: {
+        width: "65%",
+        margin: "0 auto",
+      },
+      orderNum: {
+        color: "#249052",
+        paddingRight: 10,
+        borderRight: ".5px solid rgba(20, 20, 20, .7)",
+      },
+      orderNumTitle: {
+        paddingLeft: 10,
+        color: "#141414",
+      },
+      orderNumText: {
+        marginTop: 20,
+        opacity: 0.7,
+      },
+      item: {
+        width: "calc(33% - 20px)",
+      },
+      orderForm: {
+        background: "#FFFFFF",
+        boxShadow:
+          "0px 0px 1px rgba(0, 0, 0, 0.04), 0px 2px 6px rgba(0, 0, 0, 0.04), 0px 10px 20px rgba(0, 0, 0, 0.04)",
+        borderRadius: 8,
+        width: "60%",
+        padding: 46,
+        boxSizing: "border-box",
+        maxWidth: "60%",
+        margin: "0 auto",
+        textAlign: "center",
+      },
+      titleForm: {
+        marginBottom: 16,
+      },
+      subTitleForm: {
+        marginBottom: 46,
+        opacity: 0.7,
+      },
+      inputStyle: {
+        marginBottom: 24,
+        textAlign: "left",
+        maxWidth: "inherit",
+        "& > div > div": {
+          whiteSpace: "initial",
         },
-        "& > div:nth-child(2n+1)": {
-          height: 40,
-          width: 40,
-          borderRadius: "50%",
-          backgroundColor: "#F3F3F3",
-          textAlign: "center",
-          "& > span": {
-            lineHeight: "40px",
+      },
+      inputStyleText: {
+        textAlign: "left",
+        marginBottom: 32,
+      },
+      checkboxText: {
+        alignItems: "center",
+        marginBottom: 48,
+      },
+      btnWrap: {
+        width: "calc(50% - 10px)",
+        "& > button": { width: "100%" },
+      },
+      icon: {
+        width: "18px",
+        height: "19px",
+      },
+      progress: {
+        backgroundColor: "#E0E0E0",
+        height: 36,
+        borderRadius: 4,
+        marginBottom: 24,
+        textAlign: "center",
+        "& > span": {
+          lineHeight: "36px",
+        },
+      },
+      alert: {
+        marginBottom: 32,
+      },
+      garant: { textAlign: "left" },
+      orderSteps: {
+        marginBottom: 48,
+        boxSizing: "border-box",
+        "& > div:first-child": {
+          "& > div:first-child": {
+            marginLeft: "calc(33% / 2 - 20px)",
+          },
+          "& > div:nth-child(2n+1)": {
+            height: 40,
+            width: 40,
+            borderRadius: "50%",
+            backgroundColor: "#F3F3F3",
+            textAlign: "center",
+            "& > span": {
+              lineHeight: "40px",
+            },
+          },
+          "& > div:nth-child(2n)": {
+            width: "calc(33% - 48px - 40px)",
+            height: 1,
+            backgroundColor: "#CCCFD1",
+            margin: "20px 24px",
           },
         },
-        "& > div:nth-child(2n)": {
-          width: "calc(33% - 48px - 40px)",
-          height: 1,
-          backgroundColor: "#CCCFD1",
-          margin: "20px 24px",
+        "& > div:last-child": {
+          marginTop: 12,
+          "& > div": {
+            width: "33%",
+          },
         },
       },
-      "& > div:last-child": {
-        marginTop: 12,
-        "& > div": {
-          width: "33%",
+      code: {
+        margin: 0,
+        "& input": {
+          height: 62,
+          boxSizing: "border-box",
         },
       },
-    },
-    code: {
-      margin: 0,
-      "& input": {
-        height: 62,
-        boxSizing: "border-box",
+      timer: {
+        fontSize: 16,
+        color: "#4D565F",
       },
-    },
-    timer: {
-      fontSize: 16,
-      color: "#4D565F",
-    },
-    docForm: {
-      height: 64,
-      border: "1px solid #F3F3F3",
-      borderRadius: 4,
-      marginBottom: 24,
-      padding: "8px 14px",
-      lineHeight: "48px",
-    },
-    linkReSendSms: {
-      color: "#3F0259",
-      fontSize: 16,
-      height: "auto",
-      padding: 0,
-      lineHeight: "initial",
-      cursor: "pointer",
-      textTransform: "none",
-      "&:hover, &:active": {
-        textDecoration: "underline",
-        opacity: 0.8,
-      },
-    },
-    progressBarSuccess: {
-      borderRadius: 5,
-      display: "block",
-      margin: "12px 0 32px",
-      height: 36,
-      lineHeight: "36px",
-      textAlign: "center",
-      position: "relative",
-      fontSize: 16,
-      "& > span": {
-        zIndex: 5,
-        color: "white",
-        fontWeight: "bold",
-        position: "relative",
-      },
-    },
-    successForm: {
-      backgroundColor: "rgba(125, 206, 160, 0.1)",
-      textAlign: "center",
-      padding: "56px 64px 112px",
-      "& > img": {
-        display: "block",
-        margin: "0 auto",
+      docForm: {
+        border: "1px solid #F3F3F3",
+        borderRadius: 4,
         marginBottom: 24,
+        padding: "12px",
+        lineHeight: "48px",
+        "& > div:first-child": {
+          textAlign: "left",
+          width: "60%",
+        },
+      },
+      hintText: {
+        marginBottom: 24,
+        padding: "8px 14px",
+      },
+      linkReSendSms: {
+        color: "#3F0259",
+        fontSize: 16,
+        height: "auto",
+        padding: 0,
+        lineHeight: "initial",
+        cursor: "pointer",
+        textTransform: "none",
+        "&:hover, &:active": {
+          textDecoration: "underline",
+          opacity: 0.8,
+        },
+      },
+      progressBarSuccess: {
+        borderRadius: 5,
+        display: "block",
+        margin: "12px 0 32px",
+        height: 36,
+        lineHeight: "36px",
+        textAlign: "center",
+        position: "relative",
+        fontSize: 16,
+        "& > span": {
+          zIndex: 5,
+          color: "white",
+          fontWeight: "bold",
+          position: "relative",
+        },
+      },
+      successForm: {
+        backgroundColor: "rgba(125, 206, 160, 0.1)",
+        borderRadius: 8,
+        textAlign: "center",
+        padding: "56px 64px 112px",
+        "& > img": {
+          display: "block",
+          margin: "0 auto",
+          marginBottom: 24,
+        },
+      },
+      errorForm: {
+        backgroundColor: "rgba(200, 79, 79, 0.1)",
+        textAlign: "center",
+        borderRadius: 8,
+        padding: "56px 64px 112px",
+        "& > img": {
+          display: "block",
+          margin: "0 auto",
+          marginBottom: 24,
+        },
+      },
+      progressBarInnerSuccess: {
+        position: "absolute",
+        background: "#27AE60",
+        transition: "width .5s ease-out",
+        top: 0,
+        height: 36,
+        borderRadius: 5,
+        bottom: 0,
+        zIndex: 4,
+      },
+      paymentWrap: {
+        position: "relative",
+        marginBottom: 40,
+      },
+      sliderWrap: {
+        position: "relative",
+        width: "100%",
+      },
+      input: {
+        display: "block",
+        width: "100%",
+        "& > div": {
+          width: "inherit",
+        },
+      },
+      sliderRange: {
+        position: "absolute",
+        left: 0,
+        right: 0,
+        bottom: -20,
+        color: "#b3b6ba",
+        display: "flex",
+        justifyContent: "space-between",
+        fontSize: 12,
+      },
+      btnStyle: {
+        minWidth: 150,
+        "& > span": {
+          lineHeight: "normal",
+        },
       },
     },
-    progressBarInnerSuccess: {
-      position: "absolute",
-      background: "#27AE60",
-      transition: "width .5s ease-out",
-      top: 0,
-      height: 36,
-      borderRadius: 5,
-      bottom: 0,
-      zIndex: 4,
+    [theme.breakpoints.down("sm")]: {
+      outerContainer: {
+        background: "#ffffff",
+      },
+      innerOrderForm: {},
+      container: {
+        maxWidth: 1280,
+        margin: "0 auto",
+        textAlign: "center",
+        boxSizing: "border-box",
+        padding: "24px 48px",
+      },
+      orderTitle: {
+        width: "90%",
+        margin: "0 auto",
+      },
+      orderNum: {
+        color: "#249052",
+        paddingRight: 10,
+        borderRight: ".5px solid rgba(20, 20, 20, .7)",
+      },
+      orderNumTitle: {
+        paddingLeft: 10,
+        color: "#141414",
+      },
+      orderNumText: {
+        marginTop: 20,
+        opacity: 0.7,
+      },
+      item: {
+        width: "calc(33% - 20px)",
+      },
+      orderForm: {
+        background: "#FFFFFF",
+        boxShadow:
+          "0px 0px 1px rgba(0, 0, 0, 0.04), 0px 2px 6px rgba(0, 0, 0, 0.04), 0px 10px 20px rgba(0, 0, 0, 0.04)",
+        borderRadius: 8,
+        width: "90%",
+        padding: 46,
+        boxSizing: "border-box",
+        maxWidth: "90%",
+        margin: "0 auto",
+        textAlign: "center",
+      },
+      titleForm: {
+        marginBottom: 16,
+      },
+      subTitleForm: {
+        marginBottom: 46,
+        opacity: 0.7,
+      },
+      inputStyle: {
+        marginBottom: 24,
+        textAlign: "left",
+        maxWidth: "inherit",
+        "& > div > div": {
+          whiteSpace: "initial",
+        },
+      },
+      inputStyleText: {
+        textAlign: "left",
+        marginBottom: 32,
+      },
+      checkboxText: {
+        alignItems: "center",
+        marginBottom: 48,
+      },
+      btnWrap: {
+        width: "calc(50% - 10px)",
+        "& > button": { width: "100%" },
+      },
+      icon: {
+        width: "18px",
+        height: "19px",
+      },
+      progress: {
+        backgroundColor: "#E0E0E0",
+        height: 36,
+        borderRadius: 4,
+        marginBottom: 24,
+        textAlign: "center",
+        "& > span": {
+          lineHeight: "36px",
+        },
+      },
+      alert: {
+        marginBottom: 32,
+      },
+      garant: { textAlign: "left" },
+      orderSteps: {
+        marginBottom: 48,
+        boxSizing: "border-box",
+        "& > div:first-child": {
+          "& > div:first-child": {
+            marginLeft: "calc(33% / 2 - 20px)",
+          },
+          "& > div:nth-child(2n+1)": {
+            height: 40,
+            width: 40,
+            borderRadius: "50%",
+            backgroundColor: "#F3F3F3",
+            textAlign: "center",
+            "& > span": {
+              lineHeight: "40px",
+            },
+          },
+          "& > div:nth-child(2n)": {
+            width: "calc(33% - 48px - 40px)",
+            height: 1,
+            backgroundColor: "#CCCFD1",
+            margin: "20px 24px",
+          },
+        },
+        "& > div:last-child": {
+          marginTop: 12,
+          "& > div": {
+            width: "33%",
+          },
+        },
+      },
+      code: {
+        margin: 0,
+        "& input": {
+          height: 62,
+          boxSizing: "border-box",
+        },
+      },
+      timer: {
+        fontSize: 16,
+        color: "#4D565F",
+      },
+      docForm: {
+        border: "1px solid #F3F3F3",
+        borderRadius: 4,
+        marginBottom: 24,
+        padding: 12,
+        lineHeight: "48px",
+        "& > div:first-child": {
+          textAlign: "left",
+          width: "60%",
+        },
+      },
+      hintText: {
+        marginBottom: 24,
+        padding: "8px 14px",
+      },
+      linkReSendSms: {
+        color: "#3F0259",
+        fontSize: 16,
+        height: "auto",
+        padding: 0,
+        lineHeight: "initial",
+        cursor: "pointer",
+        textTransform: "none",
+        "&:hover, &:active": {
+          textDecoration: "underline",
+          opacity: 0.8,
+        },
+      },
+      progressBarSuccess: {
+        borderRadius: 5,
+        display: "block",
+        margin: "12px 0 32px",
+        height: 36,
+        lineHeight: "36px",
+        textAlign: "center",
+        position: "relative",
+        fontSize: 16,
+        "& > span": {
+          zIndex: 5,
+          color: "white",
+          fontWeight: "bold",
+          position: "relative",
+        },
+      },
+      successForm: {
+        backgroundColor: "rgba(125, 206, 160, 0.1)",
+        borderRadius: 8,
+        textAlign: "center",
+        padding: "56px 64px 112px",
+        "& > img": {
+          display: "block",
+          margin: "0 auto",
+          marginBottom: 24,
+        },
+      },
+      errorForm: {
+        backgroundColor: "rgba(200, 79, 79, 0.1)",
+        textAlign: "center",
+        borderRadius: 8,
+        padding: "56px 64px 112px",
+        "& > img": {
+          display: "block",
+          margin: "0 auto",
+          marginBottom: 24,
+        },
+      },
+      progressBarInnerSuccess: {
+        position: "absolute",
+        background: "#27AE60",
+        transition: "width .5s ease-out",
+        top: 0,
+        height: 36,
+        borderRadius: 5,
+        bottom: 0,
+        zIndex: 4,
+      },
+      paymentWrap: {
+        position: "relative",
+        marginBottom: 40,
+      },
+      sliderWrap: {
+        position: "relative",
+        width: "100%",
+      },
+      input: {
+        display: "block",
+        width: "100%",
+        "& > div": {
+          width: "inherit",
+        },
+      },
+      sliderRange: {
+        position: "absolute",
+        left: 0,
+        right: 0,
+        bottom: -20,
+        color: "#b3b6ba",
+        display: "flex",
+        justifyContent: "space-between",
+        fontSize: 12,
+      },
+      btnStyle: {
+        minWidth: 150,
+        "& > span": {
+          lineHeight: "normal",
+        },
+      },
+    },
+    [theme.breakpoints.down("xs")]: {
+      orderTitle: {
+        width: "100%",
+        margin: "0 auto",
+      },
+      container: {
+        maxWidth: 1280,
+        margin: "0 auto",
+        textAlign: "center",
+        boxSizing: "border-box",
+        padding: "24px",
+      },
+      orderForm: {
+        width: "100%",
+        maxWidth: "100%",
+        padding: 24,
+      },
     },
   })
 );
@@ -211,11 +568,26 @@ const BccMaskedInput = (props: TextMaskCustomProps) => {
   const { inputRef, ...other } = props;
 
   return (
-    <MaskedInput
+    <InputMask
       {...other}
       ref={(ref: any) => inputRef(ref ? ref.inputElement : null)}
-      mask="+7(111) 111 11 11"
+      mask="+7(999) 999 99 99"
+      maskChar=""
       placeholder={"+7(707) 707 77 77"}
+    />
+  );
+};
+
+const BccMaskedIinInput = (props: TextMaskCustomProps) => {
+  const { inputRef, ...other } = props;
+
+  return (
+    <InputMask
+      {...other}
+      ref={(ref: any) => inputRef(ref ? ref.inputElement : null)}
+      mask="999 999 999 999"
+      maskChar=""
+      placeholder={"000 000 000 000"}
     />
   );
 };
@@ -229,22 +601,35 @@ const Order = (props: any) => {
   const [fio, setFio] = React.useState("");
   const [phone, setPhone] = React.useState("");
   const [phoneError, setPhoneError] = React.useState<boolean>(false);
+  const [iinError, setIinError] = React.useState<boolean>(false);
   const [agree, setAgree] = React.useState<boolean>(true);
+  const [success, setSuccess] = React.useState<boolean>(false);
   const [isLoading, setLoading] = React.useState(false);
   const [openError, setOpenError] = React.useState(false);
   const [code, setCode] = React.useState("");
   const [other, setOther] = React.useState("");
-  const [period, setPeriod] = React.useState("");
+  const [period, setPeriod] = React.useState(1);
   const [reason, setReason] = React.useState("");
   const [creditNumber, setCreditNumber] = React.useState("");
   const [timer, setTimer] = React.useState(0);
   const [file1, setFile1] = React.useState("");
   const [file2, setFile2] = React.useState("");
   const [file3, setFile3] = React.useState("");
-  const [branches, setBranches] = React.useState([] as any);
+  const [file1Error, setFile1Error] = React.useState(false);
+  const [file2Error, setFile2Error] = React.useState(false);
+  const [file3Error, setFile3Error] = React.useState(false);
+  const { t, i18n } = useTranslation();
+
+  const reasons = [
+    t("order.reason1"),
+    t("order.reason2"),
+    t("order.reason3"),
+    t("order.reason4"),
+    t("order.reason5"),
+    t("order.reason6"),
+  ];
 
   React.useEffect(() => {
-    api.reference.getCityBranches().then((m: any) => setBranches(m));
     let timeOut = setInterval(() => {
       if (timer !== 0) {
         setTimer(timer - 1);
@@ -263,43 +648,136 @@ const Order = (props: any) => {
     if (step === 0)
       return (
         type &&
-        filial &&
-        iin.length === 12 &&
+        fio !== "" &&
+        filial !== "" &&
+        iin.replace(/ /g, "").length === 12 &&
         phone.replace("_", "").length === 17 &&
         agree
       );
     else if (step === 1) return code.length === 6;
-    else if (step === 2)
+    else if (step === 2) {
       return type === "1"
-        ? creditNumber.length > 5 && period && reason && file1 && file2 && file3
-        : creditNumber.length > 5 &&
-            other.length > 5 &&
-            file1 &&
-            file2 &&
-            file3;
-    else return true;
+        ? creditNumber.length > 0 &&
+            +period > 0 &&
+            reason.length > 0 &&
+            (file1.length > 0 || file2.length > 0 || file3.length > 0)
+        : creditNumber.length > 0 &&
+            other.length > 0 &&
+            (file1.length > 0 || file2.length > 0 || file3.length > 0);
+    } else return true;
   };
 
-  const handleClose = () => {
-    setOpenError(false);
+  const getFio = (num: number) => {
+    const fioArray = fio.split(" ");
+    return fioArray && fioArray[num] ? fioArray[num] : "";
+  };
+
+  const generateJSON = () => {
+    const JSON = {
+      type: "SYNC",
+      body: {
+        ELMARun: {
+          token: "4e44afcd-a5e9-4710-bf8f-835792d24827",
+          data: {
+            Items: [
+              {
+                Name: "IINS",
+                Value: iin,
+              },
+              {
+                Name: "Surname",
+                Value: getFio(0),
+              },
+              {
+                Name: "Name",
+                Value: getFio(1),
+              },
+              {
+                Name: "MiddleName",
+                Value: getFio(2),
+              },
+              {
+                Name: "Branch",
+                Value: filial,
+              },
+              {
+                Name: "DeferralRequiredNumber",
+                Value: creditNumber,
+              },
+              {
+                Name: "DelayPeriod",
+                Value: period.toString(),
+              },
+              {
+                Name: "DelayReason",
+                Value: type === "1" ? reason : other,
+              },
+              {
+                Name: "PhoneNumber",
+                Value: formatPhoneNumber(),
+              },
+              {
+                Name: "EMail",
+                Value: "",
+              },
+              {
+                Name: "Base64",
+                DataArray: {
+                  WebData: [
+                    {
+                      Items: [
+                        {
+                          Name: "AddFiles",
+                          Value: file1,
+                        },
+                      ],
+                    },
+                    {
+                      Items: [
+                        {
+                          Name: "AddFiles",
+                          Value: file2,
+                        },
+                      ],
+                    },
+                    {
+                      Items: [
+                        {
+                          Name: "AddFiles",
+                          Value: file3,
+                        },
+                      ],
+                    },
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      },
+    };
+    return JSON;
   };
 
   const startProcess = () => {
+    setLoading(true);
     api.camunda
       .start({
         env: {
-          production: webConfigEnv.PRODUCTION === "1",
+          production: true,
         },
-        requestInfo: {
-          type,
-          filial,
-          fio,
-          iin,
-          phone: formatPhoneNumber(),
+        client: {
+          request: generateJSON(),
         },
       })
-      .then((res: any) => {
-        setStep(2);
+      .then((r: any) => {
+        let res = r.variables.callResult;
+        res.RunResponse &&
+        res.RunResponse.RunResult &&
+        res.RunResponse.RunResult.length > 0
+          ? setSuccess(true)
+          : setSuccess(false);
+        setStep(3);
         props.scrollToOrder(false);
         setLoading(false);
       })
@@ -318,7 +796,7 @@ const Order = (props: any) => {
     setLoading(true);
     setTimer(60);
     api.authOtp
-      .sendOtp({ iin: iin, phone: formatPhoneNumber() })
+      .sendOtp({ iin: iin.replace(/ /g, ""), phone: formatPhoneNumber() })
       .then(() => {
         localStorage.removeItem("userContext");
         setStep(1);
@@ -337,14 +815,15 @@ const Order = (props: any) => {
     setLoading(true);
     api.authOtp
       .confirmOtp({
-        iin: iin,
+        iin: iin.replace(/ /g, ""),
         phone: formatPhoneNumber(),
         otp: code,
       })
       .then((userContext) => {
         props.scrollToOrder(false);
         localStorage.setItem("userContext", JSON.stringify(userContext));
-        startProcess();
+        setStep(2);
+        setLoading(false);
       })
       .catch((e: any) => {
         props.scrollToOrder(false);
@@ -357,7 +836,7 @@ const Order = (props: any) => {
   const onReSend = () => {
     setLoading(true);
     api.authOtp
-      .sendOtp({ iin: iin, phone: formatPhoneNumber() })
+      .sendOtp({ iin: iin.replace(/ /g, ""), phone: formatPhoneNumber() })
       .then(() => {
         props.scrollToOrder(false);
         setTimer(90);
@@ -372,15 +851,56 @@ const Order = (props: any) => {
       });
   };
 
+  const handleChange1 = (e: any, results: any) => {
+    results.forEach((result: any) => {
+      const [e, file] = result;
+      const res = e.target.result.split(",");
+      console.log(res[1]);
+      console.log(file.size);
+      if (file.size > 5000000) {
+        setFile1Error(true);
+      } else {
+        setFile1Error(false);
+        setFile1(res[1]);
+      }
+    });
+  };
+
+  const handleChange2 = (e: any, results: any) => {
+    results.forEach((result: any) => {
+      const [e, file] = result;
+      const res = e.target.result.split(",");
+      if (file.size > 5000000) {
+        setFile2Error(true);
+      } else {
+        setFile2Error(false);
+        setFile2(res[1]);
+      }
+    });
+  };
+
+  const handleChange3 = (e: any, results: any) => {
+    results.forEach((result: any) => {
+      const [e, file] = result;
+      const res = e.target.result.split(",");
+      if (file.size > 5000000) {
+        setFile3Error(true);
+      } else {
+        setFile3Error(false);
+        setFile3(res[1]);
+      }
+    });
+  };
+
   return (
     <div className={classes.outerContainer} ref={props.refProp}>
       <div className={classes.container}>
         <div className={classes.orderTitle}>
           <BccTypography type="h3" weight="medium" block mb="16px">
-            Оформите заявку на отсрочку по кредиту
+            {t("order.title")}
           </BccTypography>
           <BccTypography type="p1" block color="#4D565F" mb="48px">
-            Заполните форму для заявления на предоставление отсрочки
+            {t("order.subtitle")}
           </BccTypography>
           <Grid
             container
@@ -404,26 +924,26 @@ const Order = (props: any) => {
             <Grid item container direction="row" justify="center">
               <Grid item>
                 <BccTypography type="p2" weight="medium" block mb="8px">
-                  Заполните онлайн-заявку
+                  {t("order.1")}
                 </BccTypography>
                 <BccTypography type="p3" block color="#4D565F">
-                  За 3 минуты онлайн
+                  {t("order.11")}
                 </BccTypography>
               </Grid>
               <Grid item>
                 <BccTypography type="p2" weight="medium" block mb="8px">
-                  Получите SMS
+                  {t("order.2")}
                 </BccTypography>
                 <BccTypography type="p3" block color="#4D565F">
-                  Мы отправим вам код подтверждения
+                  {t("order.22")}
                 </BccTypography>
               </Grid>
               <Grid item>
                 <BccTypography type="p2" weight="medium" block mb="8px">
-                  Дождитесь решения
+                  {t("order.3")}
                 </BccTypography>
                 <BccTypography type="p3" block color="#4D565F">
-                  Мы уведомим вас сообщением
+                  {t("order.33")}
                 </BccTypography>
               </Grid>
             </Grid>
@@ -439,16 +959,18 @@ const Order = (props: any) => {
                 mb="12px"
                 align="left"
               >
-                Шаг {step + 1}:{" "}
-                {step === 0
-                  ? "Заполнение данных"
-                  : step === 1
-                  ? "Подтверждение"
-                  : "Заявка"}
+                {step + 1 === 1
+                  ? t("order.step1")
+                  : step + 1 === 2
+                  ? t("order.step2")
+                  : t("order.step3")}
               </BccTypography>
               <div className={classes.progress}>
                 <div className={classes.progressBarSuccess}>
-                  <BccTypography type="p2" color="black">
+                  <BccTypography
+                    type="p2"
+                    color={`${step * 33 > 33 ? "white" : "black"}`}
+                  >
                     {step * 33 + " %"}
                   </BccTypography>
                   <div
@@ -465,8 +987,7 @@ const Order = (props: any) => {
                   <Grid item className={classes.alert}>
                     <BccAlert severity="error">
                       <BccTypography type="p3">
-                        Важно! Отсрочка не является прощением кредита и/или
-                        вознаграждения
+                        {t("order.notice")}
                       </BccTypography>
                     </BccAlert>
                   </Grid>
@@ -474,7 +995,7 @@ const Order = (props: any) => {
                     <BccInput
                       fullWidth={true}
                       className={classes.inputStyle}
-                      label="Тип заявки"
+                      label={t("order.type")}
                       id="type"
                       name="type"
                       value={type}
@@ -482,11 +1003,11 @@ const Order = (props: any) => {
                       variant="outlined"
                       select
                     >
-                      <MenuItem key={1} value={1}>
-                        Отсрочка по кредиту
+                      <MenuItem key="1" value="1">
+                        {t("order.type1")}
                       </MenuItem>
-                      <MenuItem key={2} value={2}>
-                        Заявка по иным вопросам
+                      <MenuItem key="2" value="2">
+                        {t("order.type2")}
                       </MenuItem>
                     </BccInput>
                   </Grid>
@@ -494,7 +1015,7 @@ const Order = (props: any) => {
                     <BccInput
                       fullWidth={true}
                       className={classes.inputStyle}
-                      label={"Выберите филиал"}
+                      label={t("order.branch")}
                       id="filial"
                       name="filial"
                       value={filial}
@@ -502,35 +1023,48 @@ const Order = (props: any) => {
                       variant="outlined"
                       select
                     >
-                      {branches !== null &&
-                        branches?.map((b: any) =>
-                          b.markers?.map((bb: any) => {
+                      {props.lang === "ru"
+                        ? cityList.map((b: any, index: number) => {
                             return (
-                              <MenuItem key={1} value={1}>
-                                {b.value + " " + bb.name}
+                              <MenuItem key={index} value={b}>
+                                {b}
                               </MenuItem>
                             );
                           })
-                        )}
+                        : cityListKz.map((b: any, index: number) => {
+                            return (
+                              <MenuItem key={index} value={b}>
+                                {b}
+                              </MenuItem>
+                            );
+                          })}
                     </BccInput>
                   </Grid>
                   <Grid item>
                     <BccInput
                       className={classes.inputStyle}
                       fullWidth
-                      label="ИИН"
+                      label={t("order.iin")}
                       variant="filled"
                       id="iin"
                       name="iin"
                       value={iin}
                       onChange={(e: any) => setIin(e.target.value)}
+                      helperText={iinError ? t("order.iinError") : ""}
+                      error={iinError ? true : false}
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                      InputProps={{
+                        inputComponent: BccMaskedIinInput as any,
+                      }}
                     />
                   </Grid>
                   <Grid item>
                     <BccInput
                       className={classes.inputStyle}
                       fullWidth
-                      label="ФИО"
+                      label={t("order.fio")}
                       variant="filled"
                       id="fio"
                       name="fio"
@@ -542,12 +1076,10 @@ const Order = (props: any) => {
                     <BccInput
                       variant="filled"
                       fullWidth
-                      label="Номер телефона"
+                      label={t("order.phone")}
                       onChange={(e: any) => setPhone(e.target.value)}
                       className={classes.inputStyle}
-                      helperText={
-                        phoneError ? "Неверный формат номера телефона" : ""
-                      }
+                      helperText={phoneError ? t("order.phoneError") : ""}
                       error={phoneError ? true : false}
                       id="phone"
                       name="phone"
@@ -577,9 +1109,16 @@ const Order = (props: any) => {
                       </Grid>
                       <Grid item>
                         <BccTypography type="p3" ml="10px">
-                          Соглашаюсь с обработкой данных и{" "}
-                          <BccLink href="https://www.bcc.kz/" target="_blank">
-                            c условиями передачи информации
+                          {t("order.agree")}{" "}
+                          <BccLink
+                            href={
+                              process.env.PUBLIC_URL + props.lang === "ru"
+                                ? "/agreement.pdf"
+                                : "/agreementKz.pdf"
+                            }
+                            target="_blank"
+                          >
+                            {t("order.agree2")}
                           </BccLink>
                         </BccTypography>
                       </Grid>
@@ -605,8 +1144,7 @@ const Order = (props: any) => {
                             xs={true}
                           >
                             <BccTypography type="p3" className={classes.garant}>
-                              Мы гарантируем безопасность и сохранность ваших
-                              данных
+                              {t("order.security")}
                             </BccTypography>
                           </Grid>
                         </Grid>
@@ -618,7 +1156,7 @@ const Order = (props: any) => {
                           color="primary"
                           onClick={() => getOtp()}
                         >
-                          Продолжить
+                          {t("order.next")}
                         </BccButton>
                       </Grid>
                     </Grid>
@@ -647,7 +1185,7 @@ const Order = (props: any) => {
                             e.target.value.replace(/\D/g, "").substr(0, 6)
                           )
                         }
-                        label={"Код подтверждения"}
+                        label={t("order.code")}
                       />
                     </Grid>
                     <Grid item xl={6} lg={6} md={6} sm={12} xs={12}>
@@ -657,13 +1195,15 @@ const Order = (props: any) => {
                         fullWidth
                         disabled={!isValid()}
                       >
-                        Подтвердить
+                        {t("order.confirm")}
                       </BccButton>
                     </Grid>
                     {timer !== 0 ? (
                       <Grid item>
                         <BccTypography type="p3" className={classes.timer}>
-                          Отправить повторно СМС через 00:{timer}
+                          {props.lang === "ru"
+                            ? `${t("order.resendFull")} 00:${timer}`
+                            : `00:${timer} ${t("order.resendFull")}`}
                         </BccTypography>
                       </Grid>
                     ) : (
@@ -673,7 +1213,7 @@ const Order = (props: any) => {
                           className={classes.linkReSendSms}
                           onClick={() => onReSend()}
                         >
-                          Отправить повторно
+                          {t("order.resend")}
                         </BccButton>
                       </Grid>
                     )}
@@ -686,7 +1226,7 @@ const Order = (props: any) => {
                       <BccInput
                         className={classes.inputStyle}
                         fullWidth
-                        label="Номер кредитного договора"
+                        label={t("order.number")}
                         variant="filled"
                         id="creditNumber"
                         name="creditNumber"
@@ -695,30 +1235,62 @@ const Order = (props: any) => {
                       />
                     </Grid>
                     <Grid item>
-                      <BccInput
-                        fullWidth={true}
-                        className={classes.inputStyle}
-                        label={"Период отсрочки"}
-                        id="period"
-                        name="period"
-                        value={period}
-                        onChange={(e: any) => setPeriod(e.target.value)}
-                        variant="outlined"
-                        select
-                      >
-                        <MenuItem key={1} value={1}>
-                          12 месяцев
-                        </MenuItem>
-                        <MenuItem key={2} value={2}>
-                          24 месяца
-                        </MenuItem>
-                      </BccInput>
+                      <div className={classes.paymentWrap}>
+                        <div className={classes.sliderWrap}>
+                          <BccInput
+                            label={t("order.period")}
+                            key="period"
+                            value={`${period
+                              .toString()
+                              .replace(/\B(?=(\d{3})+(?!\d))/g, " ")} ${t(
+                              "order.month"
+                            )}`}
+                            variant="filled"
+                            InputLabelProps={{
+                              shrink: true,
+                            }}
+                            onFocus={() => setPeriod(1)}
+                            onChange={(e: any) => {
+                              console.log(e.target.value.slice(-1));
+                              const s = +e.target.value
+                                .slice(-1)
+                                .replace(/[^0-9]/g, "");
+                              if (s > 6) setPeriod(6);
+                              else setPeriod(s);
+                            }}
+                            className={classes.input}
+                          />
+                          <BccSlider
+                            style={{
+                              left: 6,
+                              right: 6,
+                              width: "calc(100% - 12px)",
+                              bottom: -1,
+                              padding: 0,
+                              position: "absolute",
+                            }}
+                            min={1}
+                            max={6}
+                            step={1}
+                            value={period}
+                            valueLabelDisplay="off"
+                            defaultValue={period}
+                            onChange={(e: any, val: any) =>
+                              setPeriod(val instanceof Array ? val[1] : val)
+                            }
+                          />
+                          <div className={classes.sliderRange}>
+                            <span>1 {t("order.month")}</span>
+                            <span>6 {t("order.month")}</span>
+                          </div>
+                        </div>
+                      </div>
                     </Grid>
                     <Grid item>
                       <BccInput
                         fullWidth={true}
                         className={classes.inputStyle}
-                        label={"Причина отсрочки"}
+                        label={t("order.reason")}
                         id="reason"
                         name="reason"
                         value={reason}
@@ -726,12 +1298,13 @@ const Order = (props: any) => {
                         variant="outlined"
                         select
                       >
-                        <MenuItem key={1} value={1}>
-                          Причина
-                        </MenuItem>
-                        <MenuItem key={2} value={2}>
-                          Еще какая-та причина
-                        </MenuItem>
+                        {reasons.map((r: any, index: number) => {
+                          return (
+                            <MenuItem key={index} value={r}>
+                              {r}
+                            </MenuItem>
+                          );
+                        })}
                       </BccInput>
                     </Grid>
                     <Grid
@@ -742,28 +1315,41 @@ const Order = (props: any) => {
                       className={classes.docForm}
                     >
                       <Grid item>
-                        <BccTypography type="p2" color="#4D565F">
-                          Подтверждающий документ
+                        <BccTypography type="p3" color="#4D565F" mb="4px" block>
+                          {t("order.doc")}
                         </BccTypography>
+                        <BccTypography type="p4" color="#80868C" block>
+                          {t("order.docDesc")}
+                        </BccTypography>
+                        {file1Error && (
+                          <BccTypography
+                            type="p4"
+                            mt="4px"
+                            color="#C84F4F"
+                            block
+                          >
+                            {t("order.docError")}
+                          </BccTypography>
+                        )}
                       </Grid>
                       <Grid item>
-                        <input
-                          accept="application/msword"
-                          style={{ display: "none" }}
-                          id="upload1"
-                          value={file1}
-                          type="file"
-                        />
-                        <label htmlFor="upload1">
+                        <FileReaderInput
+                          as="url"
+                          accept="image/jpeg,image/png,image/gif,application/pdf"
+                          onChange={handleChange1}
+                        >
                           <BccButton
                             variant="outlined"
                             color="secondary"
                             component="span"
                             size="small"
+                            className={classes.btnStyle}
                           >
-                            Выбрать файл
+                            {file1
+                              ? t("order.fileChoosed")
+                              : t("order.fileNotChoosed")}
                           </BccButton>
-                        </label>
+                        </FileReaderInput>
                       </Grid>
                     </Grid>
                     <Grid
@@ -774,28 +1360,41 @@ const Order = (props: any) => {
                       className={classes.docForm}
                     >
                       <Grid item>
-                        <BccTypography type="p2" color="#4D565F">
-                          Подтверждающий документ
+                        <BccTypography type="p3" color="#4D565F" mb="4px" block>
+                          {t("order.doc")}
                         </BccTypography>
+                        <BccTypography type="p4" color="#80868C" block>
+                          {t("order.docDesc")}
+                        </BccTypography>
+                        {file2Error && (
+                          <BccTypography
+                            type="p4"
+                            mt="4px"
+                            color="#C84F4F"
+                            block
+                          >
+                            {t("order.docError")}
+                          </BccTypography>
+                        )}
                       </Grid>
                       <Grid item>
-                        <input
-                          accept="application/msword"
-                          style={{ display: "none" }}
-                          id="upload2"
-                          value={file2}
-                          type="file"
-                        />
-                        <label htmlFor="upload2">
+                        <FileReaderInput
+                          as="url"
+                          accept="image/jpeg,image/png,image/gif,application/pdf"
+                          onChange={handleChange2}
+                        >
                           <BccButton
                             variant="outlined"
                             color="secondary"
                             component="span"
                             size="small"
+                            className={classes.btnStyle}
                           >
-                            Выбрать файл
+                            {file1
+                              ? t("order.fileChoosed")
+                              : t("order.fileNotChoosed")}
                           </BccButton>
-                        </label>
+                        </FileReaderInput>
                       </Grid>
                     </Grid>
                     <Grid
@@ -806,28 +1405,41 @@ const Order = (props: any) => {
                       className={classes.docForm}
                     >
                       <Grid item>
-                        <BccTypography type="p2" color="#4D565F">
-                          Подтверждающий документ
+                        <BccTypography type="p3" color="#4D565F" mb="4px" block>
+                          {t("order.doc")}
                         </BccTypography>
+                        <BccTypography type="p4" color="#80868C" block>
+                          {t("order.docDesc")}
+                        </BccTypography>
+                        {file3Error && (
+                          <BccTypography
+                            type="p4"
+                            mt="4px"
+                            color="#C84F4F"
+                            block
+                          >
+                            {t("order.docError")}
+                          </BccTypography>
+                        )}
                       </Grid>
                       <Grid item>
-                        <input
-                          accept="application/msword"
-                          style={{ display: "none" }}
-                          id="upload3"
-                          value={file3}
-                          type="file"
-                        />
-                        <label htmlFor="upload3">
+                        <FileReaderInput
+                          as="url"
+                          accept="image/jpeg,image/png,image/gif,application/pdf"
+                          onChange={handleChange3}
+                        >
                           <BccButton
                             variant="outlined"
                             color="secondary"
                             component="span"
                             size="small"
+                            className={classes.btnStyle}
                           >
-                            Выбрать файл
+                            {file1
+                              ? t("order.fileChoosed")
+                              : t("order.fileNotChoosed")}
                           </BccButton>
-                        </label>
+                        </FileReaderInput>
                       </Grid>
                     </Grid>
                     <Grid item>
@@ -838,7 +1450,7 @@ const Order = (props: any) => {
                         color="primary"
                         fullWidth
                       >
-                        Отправить заявку
+                        {t("order.sendOrder")}
                       </BccButton>
                     </Grid>
                   </>
@@ -848,7 +1460,7 @@ const Order = (props: any) => {
                       <BccInput
                         className={classes.inputStyle}
                         fullWidth
-                        label="Номер кредитного договора"
+                        label={t("order.number")}
                         variant="filled"
                         id="creditNumber"
                         name="creditNumber"
@@ -860,7 +1472,7 @@ const Order = (props: any) => {
                       <BccInput
                         className={classes.inputStyleText}
                         fullWidth
-                        label="Текст заявления"
+                        label={t("order.text")}
                         variant="filled"
                         id="other"
                         name="other"
@@ -877,28 +1489,41 @@ const Order = (props: any) => {
                       className={classes.docForm}
                     >
                       <Grid item>
-                        <BccTypography type="p2" color="#4D565F">
-                          Подтверждающий документ
+                        <BccTypography type="p3" color="#4D565F" mb="4px" block>
+                          {t("order.doc")}
                         </BccTypography>
+                        <BccTypography type="p4" color="#80868C" block>
+                          {t("order.docDesc")}
+                        </BccTypography>
+                        {file1Error && (
+                          <BccTypography
+                            type="p4"
+                            mt="4px"
+                            color="#C84F4F"
+                            block
+                          >
+                            {t("order.docError")}
+                          </BccTypography>
+                        )}
                       </Grid>
                       <Grid item>
-                        <input
-                          accept="application/msword"
-                          value={file1}
-                          style={{ display: "none" }}
-                          id="upload11"
-                          type="file"
-                        />
-                        <label htmlFor="upload11">
+                        <FileReaderInput
+                          as="url"
+                          accept="image/jpeg,image/png,image/gif,application/pdf"
+                          onChange={handleChange1}
+                        >
                           <BccButton
                             variant="outlined"
                             color="secondary"
                             component="span"
                             size="small"
+                            className={classes.btnStyle}
                           >
-                            Выбрать файл
+                            {file1
+                              ? t("order.fileChoosed")
+                              : t("order.fileNotChoosed")}
                           </BccButton>
-                        </label>
+                        </FileReaderInput>
                       </Grid>
                     </Grid>
                     <Grid
@@ -909,28 +1534,41 @@ const Order = (props: any) => {
                       className={classes.docForm}
                     >
                       <Grid item>
-                        <BccTypography type="p2" color="#4D565F">
-                          Подтверждающий документ
+                        <BccTypography type="p3" color="#4D565F" mb="4px" block>
+                          {t("order.doc")}
                         </BccTypography>
+                        <BccTypography type="p4" color="#80868C" block>
+                          {t("order.docDesc")}
+                        </BccTypography>
+                        {file2Error && (
+                          <BccTypography
+                            type="p4"
+                            mt="4px"
+                            color="#C84F4F"
+                            block
+                          >
+                            {t("order.docError")}
+                          </BccTypography>
+                        )}
                       </Grid>
                       <Grid item>
-                        <input
-                          accept="application/msword"
-                          style={{ display: "none" }}
-                          id="upload22"
-                          value={file2}
-                          type="file"
-                        />
-                        <label htmlFor="upload22">
+                        <FileReaderInput
+                          as="url"
+                          accept="image/jpeg,image/png,image/gif,application/pdf"
+                          onChange={handleChange2}
+                        >
                           <BccButton
                             variant="outlined"
                             color="secondary"
                             component="span"
                             size="small"
+                            className={classes.btnStyle}
                           >
-                            Выбрать файл
+                            {file1
+                              ? t("order.fileChoosed")
+                              : t("order.fileNotChoosed")}
                           </BccButton>
-                        </label>
+                        </FileReaderInput>
                       </Grid>
                     </Grid>
                     <Grid
@@ -941,28 +1579,41 @@ const Order = (props: any) => {
                       className={classes.docForm}
                     >
                       <Grid item>
-                        <BccTypography type="p2" color="#4D565F">
-                          Подтверждающий документ
+                        <BccTypography type="p3" color="#4D565F" mb="4px" block>
+                          {t("order.doc")}
                         </BccTypography>
+                        <BccTypography type="p4" color="#80868C" block>
+                          {t("order.docDesc")}
+                        </BccTypography>
+                        {file3Error && (
+                          <BccTypography
+                            type="p4"
+                            mt="4px"
+                            color="#C84F4F"
+                            block
+                          >
+                            {t("order.docError")}
+                          </BccTypography>
+                        )}
                       </Grid>
                       <Grid item>
-                        <input
-                          accept="application/msword"
-                          style={{ display: "none" }}
-                          id="upload33"
-                          value={file3}
-                          type="file"
-                        />
-                        <label htmlFor="upload33">
+                        <FileReaderInput
+                          as="url"
+                          accept="image/jpeg,image/png,image/gif,application/pdf"
+                          onChange={handleChange3}
+                        >
                           <BccButton
                             variant="outlined"
                             color="secondary"
                             component="span"
                             size="small"
+                            className={classes.btnStyle}
                           >
-                            Выбрать файл
+                            {file1
+                              ? t("order.fileChoosed")
+                              : t("order.fileNotChoosed")}
                           </BccButton>
-                        </label>
+                        </FileReaderInput>
                       </Grid>
                     </Grid>
                     <Grid item>
@@ -973,12 +1624,12 @@ const Order = (props: any) => {
                         color="primary"
                         fullWidth
                       >
-                        Отправить заявку
+                        {t("order.sendOrder")}
                       </BccButton>
                     </Grid>
                   </>
                 )
-              ) : (
+              ) : success ? (
                 <Grid item>
                   <div className={classes.successForm}>
                     <img
@@ -986,10 +1637,25 @@ const Order = (props: any) => {
                       alt=""
                     />
                     <BccTypography type="h6" color="#1F7042" mb="16px">
-                      Заявка успешно отправлена
+                      {t("order.success")}
                     </BccTypography>
                     <BccTypography type="p2" color="#1F7042">
-                      Следуйте инструкции, которые мы отправили по СМС
+                      {t("order.successDesc")}
+                    </BccTypography>
+                  </div>
+                </Grid>
+              ) : (
+                <Grid item>
+                  <div className={classes.errorForm}>
+                    <img
+                      src={process.env.PUBLIC_URL + "/img/error.svg"}
+                      alt=""
+                    />
+                    <BccTypography type="h6" color="initial" mb="16px">
+                      {t("order.error")}
+                    </BccTypography>
+                    <BccTypography type="p2" color="initial">
+                      {t("order.errorDesc")}
                     </BccTypography>
                   </div>
                 </Grid>
