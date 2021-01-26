@@ -302,7 +302,7 @@ const Slider = (props: SliderProps) => {
             >
               <Grid item>
                 <a href="https://www.bcc.kz/deferral">
-                  <img src={process.env.PUBLIC_URL + "/img/logo.svg"} />
+                  <img src={process.env.PUBLIC_URL + "/new-logo.svg"} />
                 </a>
               </Grid>
               <Grid item>
