@@ -1,6 +1,6 @@
 {
-  "homepage": "http://bcc.kz/deferral",
-  "name": "deferral",
+  "homepage": "http://bcc.kz/referral-program",
+  "name": "referral-program",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

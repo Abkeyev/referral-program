@@ -3,7 +3,6 @@ import { server } from "./axios";
 const webConfigEnv = (window as any).env;
 
 export interface OtpRequest {
-  iin?: string;
   phone?: string;
   otp?: string;
 }
@@ -19,7 +18,6 @@ export class Token {
 
 export class AuthOtpController {
   async sendOtp(request?: OtpRequest): Promise<any> {
-    console.log("submit otp server");
     return await server.post(
       `/hotspot/sendOtp`,
       {
@@ -39,7 +37,8 @@ export class AuthOtpController {
       },
       {
         baseURL: webConfigEnv.GREEN_API_OTP,
-      }
+      },
+      true
     );
   }
 }

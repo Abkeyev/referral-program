@@ -72,13 +72,15 @@ export class Server {
     return axios.post(url, data, config).then((r) => r.data);
   }
 
-  public post(url: string, data: any, config = {} as any): any {
+  public post(url: string, data: any, config = {} as any, notoken: boolean = false): any {
     config = config || {};
     config.headers = config.headers || {};
-    var userContext = JSON.parse(localStorage.getItem("userContext") || "{}");
-    if (!!(userContext.token || {}).accessToken) {
-      config.headers.Authorization =
-        "Bearer " + (userContext.token || {}).accessToken;
+    if(!notoken) {
+      var userContext = JSON.parse(localStorage.getItem("userContext") || "{}");
+      if (!!(userContext.token || {}).accessToken) {
+        config.headers.Authorization =
+          "Bearer " + (userContext.token || {}).accessToken;
+      }
     }
     config.baseURL = config.baseURL || webConfigEnv.SERVER_URL;
     return axios.post(url, data, config).then((r) => r.data);

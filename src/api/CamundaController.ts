@@ -7,15 +7,11 @@ export class CamundaController {
     return server.post(
       `/process/start`,
       {
-        processDefinitionKey: "deferral",
+        processDefinitionKey: "referrals_program",
         variables,
       },
       {
         baseURL: webConfigEnv.GREEN_API,
-        header: {
-          maxContentLength: 100000000,
-          maxBodyLength: 1000000000,
-        },
       }
     );
   }
@@ -23,7 +19,7 @@ export class CamundaController {
     return server.post(
       `/process/start`,
       {
-        processDefinitionKey: "deferral",
+        processDefinitionKey: "referrals_program",
         variables,
       },
       {

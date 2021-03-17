@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme: Theme) =>
       container: {
         maxWidth: 1280,
         boxSizing: "border-box",
-        padding: "48px",
+        padding: "36px 48px",
         margin: "0 auto",
       },
       foot: {
@@ -53,7 +53,11 @@ const useStyles = makeStyles((theme: Theme) =>
         padding: "24px",
       },
     },
-    [theme.breakpoints.down("xs")]: {},
+    [theme.breakpoints.down("xs")]: {
+      outerContainer: {
+        backgroundColor: "#303030",
+      },
+    },
   })
 );
 
@@ -71,7 +75,7 @@ const Footer = (props: any) => {
         >
           <Grid item>
             <BccTypography type="p2" block color="#FAFAFA">
-              © 2000 - 2020 {t("footer.bcc")}
+              © 2000 - {new Date().getFullYear()} {t("footer.bcc")}
             </BccTypography>
             <BccTypography type="p2" block color="#FAFAFA">
               {t("footer.rights")}
