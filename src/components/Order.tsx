@@ -422,7 +422,7 @@ const Order = () => {
                     <BccInput
                       variant="filled"
                       fullWidth
-                      label="Номер телефона"
+                      label="Ваш номер телефона"
                       onChange={(e: any) => setPhone(e.target.value)}
                       className={classes.inputStyle}
                       id="phone"
@@ -451,12 +451,12 @@ const Order = () => {
                       <MenuItem key="1" value="0.201.1.0307###Кредит наличными">
                         Кредит наличными
                       </MenuItem>
-                      <MenuItem key="2" value="0.100.1.1.127###Эталон">
+                      {/* <MenuItem key="2" value="0.100.1.1.127###Эталон">
                         Эталон
                       </MenuItem>
                       <MenuItem key="3" value="0.100.1.1.128###Эталон+">
                         Эталон+
-                      </MenuItem>
+                      </MenuItem> */}
                     </BccInput>
                   </Grid>
                   <Grid item>
@@ -475,7 +475,7 @@ const Order = () => {
                     <BccInput
                       variant="filled"
                       fullWidth
-                      label="Номер телефона реферала"
+                      label="Номер телефона друга"
                       onChange={(e: any) => setPhoneRef(e.target.value)}
                       className={classes.inputStyle}
                       id="phone"
